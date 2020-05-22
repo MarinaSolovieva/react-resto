@@ -2,18 +2,49 @@ import React, {Component} from 'react';
 import MenuListItem from '../menu-list-item';
 
 import './menu-list.scss';
+import {connect} from "react-redux";
+import WithRestoService from "../hoc";
+import {menuLoaded} from "../../actions";
+import Spinner from "../spinner";
 
 class MenuList extends Component {
 
-    render() {
+    componentDidMount() {
+        const {RestoService, menuLoaded} = this.props
+        RestoService.getMenuItems()
+            .then(res => menuLoaded(res))
+            .catch(err => console.log("Произошла ошибка"))
 
+    }
+
+    render() {
+        const {menuItems, loading} = this.props;
         return (
-            <ul className="menu__list">
-                <MenuListItem/>
-            </ul>
+            <>
+            {
+                loading
+                ? <Spinner/>
+                : <ul className="menu__list">
+                    {
+                        menuItems.map(menuItem => {
+                            return <MenuListItem key={menuItem.id} menuItem={menuItem}/>
+                        })
+                    }
+                </ul>
+            }
+            </>
         )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        menuItems: state.menu,
+        loading: state.loading
     }
 };
 
-
-export default MenuList;
+const mapDispatchToProps = {
+    menuLoaded
+};
+export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(MenuList));
