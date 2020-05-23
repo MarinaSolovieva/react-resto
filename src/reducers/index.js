@@ -12,6 +12,11 @@ const reducer = (state =  initialState, action) => {
                 menu: action.payload,
                 loading: false
             };
+        case "MENU_REQUESTED":
+            return {
+                ...state,
+                loading: true
+            };
         default:
             return state;
     }
